@@ -1,0 +1,61 @@
+BLUETOOTH SETTINGS HELP
+
+Manage Bluetooth devices with status information.
+
+POWER
+-----
+Toggle Bluetooth radio on/off. Must be ON to connect
+to devices.
+
+PAIRED DEVICES
+--------------
+View all paired devices with status indicators:
+
+  [Connected]  Device is currently connected
+  [Bat: XX%]   Battery level (if supported)
+  [Trusted]    Auto-connect enabled
+
+Select a device to manage it.
+
+DEVICE ACTIONS
+--------------
+When you select a paired device:
+
+  Connect/Disconnect  Toggle connection
+  Toggle Trust        Enable/disable auto-connect
+  Remove Device       Unpair and forget device
+  Device Info         Show all device details
+
+QUICK CONNECT
+-------------
+Quickly connect to a disconnected paired device.
+Shows only devices that aren't currently connected.
+
+SCAN FOR DEVICES
+----------------
+Discover nearby Bluetooth devices. Make sure your
+device is in pairing mode before scanning.
+
+After scan, select a device to pair. The device
+will be automatically trusted for future connections.
+
+DISCONNECT ALL
+--------------
+Disconnect all currently connected Bluetooth devices.
+
+BATTERY LEVEL
+-------------
+Battery percentage shown for devices that support it
+(mostly headphones and game controllers). Requires
+Bluetooth LE battery service support.
+
+TIPS
+----
+- Put device in pairing mode before scanning
+- Trust devices you want to auto-connect
+- Some devices need PIN confirmation
+
+DEPENDENCIES
+------------
+Required: bluetoothctl (bluez)
+Optional: upower (additional battery info)

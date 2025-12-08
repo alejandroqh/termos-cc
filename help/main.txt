@@ -1,0 +1,46 @@
+TERMOS CONTROL CENTER - MAIN HELP
+
+Welcome to TermOS Control Center, a TUI-based system
+settings manager for your terminal.
+
+NAVIGATION
+----------
+Use arrow keys to navigate menus and Enter to select.
+Press ESC or select Back to return to previous menu.
+
+MAIN MENU OPTIONS
+-----------------
+Dashboard       Quick overview of system status
+                Shows WiFi, Bluetooth, battery, etc.
+
+WiFi            Connect to wireless networks
+                Uses nmtui for configuration
+
+Network & VPN   VPN connections, WireGuard, DNS
+                Network diagnostics and tests
+
+Audio           Volume control, output/input devices
+                Per-application volume control
+
+Display         Resolution, rotation, night mode
+                Brightness adjustment
+
+Bluetooth       Pair and manage Bluetooth devices
+                Shows battery and connection status
+
+Storage         Disk management, mount/unmount
+                USB safe removal, SMART status
+
+Updates         Check and install system updates
+                Package search and management
+
+System Info     Hardware info, sensors, monitoring
+                CPU, memory, GPU, temperatures
+
+Power           Lock screen, reboot, shutdown
+
+TIPS
+----
+- Press the number key for quick selection
+- Some features require specific tools installed
+- Check Help > Dependencies for tool status

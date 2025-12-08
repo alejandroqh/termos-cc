@@ -1,0 +1,43 @@
+NETWORK & VPN HELP
+
+Manage network connections, VPNs, DNS, and diagnostics.
+
+VPN CONNECTIONS
+---------------
+View and manage VPN connections configured in
+NetworkManager. Select a VPN to connect or disconnect.
+
+To add a new VPN:
+  nmcli connection import type openvpn file config.ovpn
+  nmcli connection import type wireguard file wg.conf
+
+WIREGUARD
+---------
+Manage WireGuard VPN interfaces. Toggle interfaces
+up or down. Requires wg-quick for management.
+
+Config location: /etc/wireguard/*.conf
+
+DNS SETTINGS
+------------
+View current DNS servers and get instructions for
+changing to popular DNS providers:
+
+  Cloudflare:  1.1.1.1, 1.0.0.1
+  Google:      8.8.8.8, 8.8.4.4
+  Quad9:       9.9.9.9
+  OpenDNS:     208.67.222.222
+
+DIAGNOSTICS
+-----------
+Ping Gateway    Test local network connectivity
+Ping Internet   Test internet connectivity (8.8.8.8)
+Traceroute      Trace route to destination
+Interfaces      Show network interface info
+Routes          Show routing table
+Speed Test      Measure internet speed
+
+DEPENDENCIES
+------------
+Required: nmcli (NetworkManager)
+Optional: wg (WireGuard), traceroute, speedtest-cli

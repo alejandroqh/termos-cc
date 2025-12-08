@@ -1,0 +1,32 @@
+DASHBOARD HELP
+
+The Dashboard provides a quick overview of your
+system status at a glance.
+
+DISPLAYED INFORMATION
+---------------------
+WiFi        Connection status, network name, signal
+Bluetooth   Power status, connected device
+Volume      Current level with visual bar
+Brightness  Current screen brightness percentage
+Battery     Charge level and charging status
+CPU Load    System load averages (1, 5, 15 min)
+Memory      Used/total RAM with percentage
+Disk        Root partition usage
+
+AUTO-REFRESH
+------------
+The dashboard automatically refreshes every 10 seconds.
+Press any key to stop auto-refresh.
+
+NAVIGATION
+----------
+Refresh     Manually refresh all values
+Menu        Return to main menu
+ESC         Return to main menu
+
+TIPS
+----
+- N/A values indicate missing tools or hardware
+- Battery shows "N/A" on desktop systems
+- Use this to quickly check system health

@@ -1,0 +1,49 @@
+AUDIO SETTINGS HELP
+
+Control audio output, input, and per-application volume.
+
+VOLUME CONTROL
+--------------
+Adjust master volume with quick presets or custom values.
+Toggle mute on/off. Volume can go up to 150%.
+
+OUTPUT DEVICE
+-------------
+Select default audio output (speakers, headphones, HDMI).
+The [DEFAULT] marker shows current output device.
+
+INPUT (MICROPHONE)
+------------------
+Control microphone volume and mute status.
+Select input device for recording/calls.
+Note: .monitor devices are excluded (internal use).
+
+PER-APPLICATION VOLUME
+----------------------
+Adjust volume for individual applications currently
+playing audio. Useful for balancing music and game
+sounds, or muting specific apps.
+
+Note: Only apps actively playing audio appear here.
+
+AUDIO PROFILES
+--------------
+Switch between audio profiles (analog stereo, HDMI,
+headset, etc.). Profiles depend on your sound card.
+
+QUICK ACTIONS
+-------------
+Quick volume adjustment without entering submenus:
+  - Increase (+10%)
+  - Decrease (-10%)
+  - Toggle Mute
+
+ADVANCED
+--------
+For more control, open pulsemixer for a full-featured
+terminal audio mixer.
+
+DEPENDENCIES
+------------
+Required: pactl (PulseAudio/PipeWire)
+Optional: pulsemixer (advanced mixer)

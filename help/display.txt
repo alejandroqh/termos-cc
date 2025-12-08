@@ -1,0 +1,50 @@
+DISPLAY SETTINGS HELP
+
+Manage display resolution, rotation, and night mode.
+
+DISPLAY CONFIGURATION
+---------------------
+Each connected display is listed with its current
+resolution. Select a display to:
+
+  Resolution    Change screen resolution
+  Rotation      Rotate display (0, 90, 180, 270 deg)
+  Set Primary   Make this the primary display (X11)
+  Turn On/Off   Enable or disable the display
+
+MULTI-MONITOR
+-------------
+On X11, you can configure multiple displays:
+  - Set different resolutions per monitor
+  - Arrange relative positions
+  - Choose primary display
+
+Note: Wayland has limited support for some features.
+
+NIGHT MODE (REDSHIFT)
+---------------------
+Reduce blue light for comfortable nighttime viewing.
+
+  3500K   Warm (orange tint) - best for night
+  4500K   Moderate - balanced
+  5500K   Slight - minimal change
+  Custom  Enter any temperature (2500-6500K)
+
+Night mode persists until disabled or system restart.
+
+BRIGHTNESS
+----------
+Adjust screen backlight brightness:
+  - Quick steps (10% increments)
+  - Preset levels (25%, 50%, 75%, 100%)
+
+DETECT DISPLAYS
+---------------
+Force detection of newly connected displays.
+
+DEPENDENCIES
+------------
+X11:     xrandr
+Wayland: wlr-randr
+Night:   redshift
+Bright:  brightnessctl
