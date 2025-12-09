@@ -120,63 +120,11 @@ toggle_display() {
 }
 
 # ============================================================================
-# Brightness Functions
-# ============================================================================
-
-get_brightness() {
-    if has_tool brightnessctl; then
-        brightnessctl -m 2>/dev/null | cut -d',' -f4 | tr -d '%'
-    else
-        echo "N/A"
-    fi
-}
-
-set_brightness() {
-    local value="$1"
-    if has_tool brightnessctl; then
-        brightnessctl set "$value" > /dev/null 2>&1
-    fi
-}
-
-brightness_submenu() {
-    while true; do
-        local current=$(get_brightness)
-
-        choice=$(dialog --backtitle "$BACKTITLE" \
-            --title "[ Brightness ]" \
-            --menu "Current: ${current}%" 16 50 6 \
-            1 "Increase (+10%)" \
-            2 "Decrease (-10%)" \
-            3 "Set to 25%" \
-            4 "Set to 50%" \
-            5 "Set to 75%" \
-            6 "Set to 100%" \
-            2>&1 >/dev/tty)
-
-        local exit_status=$?
-        [ $exit_status -ne 0 ] && return
-
-        case $choice in
-            1) set_brightness +10% ;;
-            2) set_brightness 10%- ;;
-            3) set_brightness 25% ;;
-            4) set_brightness 50% ;;
-            5) set_brightness 75% ;;
-            6) set_brightness 100% ;;
-        esac
-    done
-}
-
-# ============================================================================
 # Night Mode (Redshift)
 # ============================================================================
 
-is_redshift_running() {
-    pgrep -x redshift > /dev/null 2>&1
-}
-
 get_night_mode_status() {
-    if is_redshift_running; then
+    if is_process_running redshift; then
         echo "ON"
     else
         echo "OFF"
@@ -284,22 +232,11 @@ resolution_menu() {
         return
     fi
 
-    local menu_items=""
-    local i=1
-    while IFS= read -r res; do
-        [ -z "$res" ] && continue
-        menu_items="$menu_items $i \"$res\" "
-        eval "res_$i=\"$res\""
-        i=$((i + 1))
-    done <<< "$resolutions"
+    local choice=$(build_simple_menu "Select Resolution" "Choose resolution for $display:" "$resolutions" 18 50)
+    [ $? -ne 0 ] && return
 
-    choice=$(eval "dialog --backtitle '$BACKTITLE' \
-        --title '[ Select Resolution ]' \
-        --menu 'Choose resolution for $display:' 18 50 10 $menu_items" 2>&1 >/dev/tty)
-
-    [ -z "$choice" ] && return
-
-    eval "selected=\$res_$choice"
+    # Extract the selected resolution (choice is the index, we need the actual line)
+    local selected=$(echo "$resolutions" | sed -n "${choice}p")
     set_resolution "$display" "$selected"
 }
 

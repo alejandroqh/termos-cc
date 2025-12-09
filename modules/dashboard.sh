@@ -169,21 +169,13 @@ dash_get_brightness() {
 }
 
 dash_get_battery() {
-    local bat_path=""
-    for path in /sys/class/power_supply/BAT0 /sys/class/power_supply/BAT1; do
-        if [ -f "$path/capacity" ]; then
-            bat_path="$path"
-            break
-        fi
-    done
+    local cap=$(get_battery_percent)
+    local status=$(get_battery_status)
 
-    if [ -z "$bat_path" ]; then
+    if [ "$cap" -eq 0 ] || [ "$status" = "Unknown" ]; then
         echo "$SYM_WARN|N/A|No battery"
         return
     fi
-
-    local cap=$(cat "$bat_path/capacity" 2>/dev/null)
-    local status=$(cat "$bat_path/status" 2>/dev/null)
 
     local sym="$SYM_BAT"
     local state="$status"
@@ -231,8 +223,7 @@ dash_get_cpu_load() {
 
 dash_get_memory() {
     local percent=$(get_memory_percent)
-    local used=$(free -h | awk '/^Mem:/ {print $3}')
-    local total=$(free -h | awk '/^Mem:/ {print $2}')
+    local info=$(get_memory_info)
 
     local sym="$SYM_OK"
     local state="OK"
@@ -245,21 +236,12 @@ dash_get_memory() {
         state="High"
     fi
 
-    echo "$sym|$used / $total|${percent}%"
+    echo "$sym|$info|${percent}%"
 }
 
 dash_get_disk() {
     local percent=$(get_disk_percent)
-    # df columns vary: find used and total from the numeric columns
-    local df_line=$(df -h / | tail -1)
-    local total=$(echo "$df_line" | awk '{print $1}')
-    local used=$(echo "$df_line" | awk '{print $2}')
-
-    # If first column looks like a device path, shift columns
-    if echo "$total" | grep -qE "^/"; then
-        total=$(echo "$df_line" | awk '{print $2}')
-        used=$(echo "$df_line" | awk '{print $3}')
-    fi
+    local info=$(get_disk_info)
 
     local sym="$SYM_OK"
     local state="OK"
@@ -272,7 +254,7 @@ dash_get_disk() {
         state="High"
     fi
 
-    echo "$sym|$used / $total|${percent}%"
+    echo "$sym|$info|${percent}%"
 }
 
 dash_get_uptime() {

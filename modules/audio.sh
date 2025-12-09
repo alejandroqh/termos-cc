@@ -186,8 +186,8 @@ output_device_menu() {
             return
         fi
 
-        local menu_items=""
-        local i=1
+        # Prepare menu data in "key:display" format
+        local menu_data=""
         while IFS=':' read -r idx name; do
             [ -z "$name" ] && continue
             local desc=$(get_sink_name "$name")
@@ -196,18 +196,12 @@ output_device_menu() {
             local marker=""
             [ "$name" = "$default" ] && marker=" [DEFAULT]"
 
-            menu_items="$menu_items $i \"$desc$marker\" "
-            eval "sink_$i=\"$name\""
-            i=$((i + 1))
+            menu_data="${menu_data}${name}:${desc}${marker}\n"
         done <<< "$sinks"
 
-        choice=$(eval "dialog --backtitle '$BACKTITLE' \
-            --title '[ Output Devices ]' \
-            --menu 'Select output device:' 15 65 8 $menu_items" 2>&1 >/dev/tty)
+        local selected=$(build_dynamic_menu "Output Devices" "Select output device:" "$menu_data" ":" 15 65)
+        [ $? -ne 0 ] && return
 
-        [ -z "$choice" ] && return
-
-        eval "selected=\$sink_$choice"
         set_default_sink "$selected"
         show_info "Output set to: $selected"
     done
@@ -258,8 +252,8 @@ select_input_device() {
         return
     fi
 
-    local menu_items=""
-    local i=1
+    # Prepare menu data in "key:display" format
+    local menu_data=""
     while IFS=':' read -r idx name; do
         [ -z "$name" ] && continue
         local desc=$(get_source_name "$name")
@@ -268,18 +262,12 @@ select_input_device() {
         local marker=""
         [ "$name" = "$default" ] && marker=" [DEFAULT]"
 
-        menu_items="$menu_items $i \"$desc$marker\" "
-        eval "source_$i=\"$name\""
-        i=$((i + 1))
+        menu_data="${menu_data}${name}:${desc}${marker}\n"
     done <<< "$sources"
 
-    choice=$(eval "dialog --backtitle '$BACKTITLE' \
-        --title '[ Input Devices ]' \
-        --menu 'Select input device:' 15 65 8 $menu_items" 2>&1 >/dev/tty)
+    local selected=$(build_dynamic_menu "Input Devices" "Select input device:" "$menu_data" ":" 15 65)
+    [ $? -ne 0 ] && return
 
-    [ -z "$choice" ] && return
-
-    eval "selected=\$source_$choice"
     set_default_source "$selected"
     show_info "Input set to: $selected"
 }
@@ -297,24 +285,19 @@ per_app_menu() {
             return
         fi
 
-        local menu_items=""
-        local i=1
+        # Prepare menu data in "idx,name:display" format
+        local menu_data=""
         while IFS=':' read -r idx name vol; do
             [ -z "$idx" ] && continue
-            menu_items="$menu_items $i \"$name (${vol}%)\" "
-            eval "app_idx_$i=\"$idx\""
-            eval "app_name_$i=\"$name\""
-            i=$((i + 1))
+            menu_data="${menu_data}${idx},${name}:${name} (${vol}%)\n"
         done <<< "$inputs"
 
-        choice=$(eval "dialog --backtitle '$BACKTITLE' \
-            --title '[ Per-Application Volume ]' \
-            --menu 'Select application:' 15 55 8 $menu_items" 2>&1 >/dev/tty)
+        local selected=$(build_dynamic_menu "Per-Application Volume" "Select application:" "$menu_data" ":" 15 55)
+        [ $? -ne 0 ] && return
 
-        [ -z "$choice" ] && return
-
-        eval "selected_idx=\$app_idx_$choice"
-        eval "selected_name=\$app_name_$choice"
+        # Extract idx and name from selected (format: "idx,name")
+        local selected_idx=$(echo "$selected" | cut -d',' -f1)
+        local selected_name=$(echo "$selected" | cut -d',' -f2-)
 
         app_volume_menu "$selected_idx" "$selected_name"
     done
@@ -355,23 +338,15 @@ app_volume_menu() {
 AUDIO_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/termos/audio_enabled"
 
 is_pipewire_running() {
-    pgrep -x pipewire >/dev/null 2>&1
+    is_process_running pipewire
 }
 
 is_audio_enabled_on_boot() {
-    # Audio is enabled by default if config file doesn't exist or doesn't say "disabled"
-    if [ ! -f "$AUDIO_CONFIG" ] || [ "$(cat "$AUDIO_CONFIG" 2>/dev/null)" != "disabled" ]; then
-        return 0
-    fi
-    return 1
+    is_service_enabled_in_config "$AUDIO_CONFIG" "disabled"
 }
 
 get_pipewire_status() {
-    if is_pipewire_running; then
-        echo "Running"
-    else
-        echo "Stopped"
-    fi
+    get_process_status pipewire
 }
 
 get_boot_status() {
@@ -487,24 +462,18 @@ profiles_menu() {
         return
     fi
 
-    local menu_items=""
-    local i=1
+    # Prepare menu data in "key:display" format
+    local menu_data=""
     while IFS= read -r profile; do
         [ -z "$profile" ] && continue
         local marker=""
         [ "$profile" = "$active" ] && marker=" [ACTIVE]"
-        menu_items="$menu_items $i \"$profile$marker\" "
-        eval "profile_$i=\"$profile\""
-        i=$((i + 1))
+        menu_data="${menu_data}${profile}:${profile}${marker}\n"
     done <<< "$profiles"
 
-    choice=$(eval "dialog --backtitle '$BACKTITLE' \
-        --title '[ Audio Profiles ]' \
-        --menu 'Select profile:' 15 60 8 $menu_items" 2>&1 >/dev/tty)
+    local selected=$(build_dynamic_menu "Audio Profiles" "Select profile:" "$menu_data" ":" 15 60)
+    [ $? -ne 0 ] && return
 
-    [ -z "$choice" ] && return
-
-    eval "selected=\$profile_$choice"
     set_card_profile "$first_card" "$selected"
     show_info "Profile changed to: $selected"
 }

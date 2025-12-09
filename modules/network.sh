@@ -52,27 +52,19 @@ vpn_menu() {
             return
         fi
 
-        # Build menu
-        local menu_items=""
-        local i=1
+        # Prepare menu data in "conn:display" format
+        local menu_data=""
         while IFS= read -r conn; do
             [ -z "$conn" ] && continue
             if echo "$active" | grep -qx "$conn"; then
-                menu_items="$menu_items $i \"$conn [ACTIVE]\" "
+                menu_data="${menu_data}${conn}:${conn} [ACTIVE]\n"
             else
-                menu_items="$menu_items $i \"$conn\" "
+                menu_data="${menu_data}${conn}:${conn}\n"
             fi
-            eval "vpn_$i=\"$conn\""
-            i=$((i + 1))
         done <<< "$connections"
 
-        choice=$(eval "dialog --backtitle '$BACKTITLE' \
-            --title '[ VPN Connections ]' \
-            --menu 'Select VPN:' 15 50 8 $menu_items" 2>&1 >/dev/tty)
-
-        [ -z "$choice" ] && return
-
-        eval "selected=\$vpn_$choice"
+        local selected=$(build_dynamic_menu "VPN Connections" "Select VPN:" "$menu_data" ":" 15 50)
+        [ $? -ne 0 ] && return
 
         # Check if active
         if echo "$active" | grep -qx "$selected"; then
@@ -135,23 +127,16 @@ wireguard_menu() {
             return
         fi
 
-        local menu_items=""
-        local i=1
+        # Prepare menu data in "iface:display" format
+        local menu_data=""
         while IFS= read -r iface; do
             [ -z "$iface" ] && continue
             local status=$(get_wg_status "$iface")
-            menu_items="$menu_items $i \"$iface [$status]\" "
-            eval "wg_$i=\"$iface\""
-            i=$((i + 1))
+            menu_data="${menu_data}${iface}:${iface} [${status}]\n"
         done <<< "$all_interfaces"
 
-        choice=$(eval "dialog --backtitle '$BACKTITLE' \
-            --title '[ WireGuard ]' \
-            --menu 'Select interface to toggle:' 15 50 8 $menu_items" 2>&1 >/dev/tty)
-
-        [ -z "$choice" ] && return
-
-        eval "selected=\$wg_$choice"
+        local selected=$(build_dynamic_menu "WireGuard" "Select interface to toggle:" "$menu_data" ":" 15 50)
+        [ $? -ne 0 ] && return
         wg_toggle "$selected"
     done
 }

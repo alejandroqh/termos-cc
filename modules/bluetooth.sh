@@ -231,9 +231,8 @@ show_paired_devices() {
         devices=$(get_paired_devices)
         [ -z "$devices" ] && return
 
-        # Build menu from devices with status indicators
-        menu_items=""
-        i=1
+        # Prepare menu data in "mac:name status" format
+        local menu_data=""
         while IFS= read -r line; do
             [ -z "$line" ] && continue
             mac=$(echo "$line" | awk '{print $2}')
@@ -252,18 +251,12 @@ show_paired_devices() {
                 status="$status [Trusted]"
             fi
 
-            menu_items="$menu_items $i \"$name $status\" "
-            eval "device_$i=\"$mac\""
-            i=$((i + 1))
+            menu_data="${menu_data}${mac}:${name} ${status}\n"
         done <<< "$devices"
 
-        choice=$(eval "dialog --backtitle '$BACKTITLE' \
-            --title '[ Paired Devices ]' \
-            --menu 'Select device:' 16 65 8 $menu_items" 2>&1 >/dev/tty)
+        local selected_mac=$(build_dynamic_menu "Paired Devices" "Select device:" "$menu_data" ":" 16 65)
+        [ $? -ne 0 ] && return
 
-        [ -z "$choice" ] && return
-
-        eval "selected_mac=\$device_$choice"
         device_action "$selected_mac"
     done
 }
@@ -286,8 +279,8 @@ scan_devices() {
         return
     fi
 
-    menu_items=""
-    i=1
+    # Prepare menu data in "mac:name" format
+    local menu_data=""
     while IFS= read -r line; do
         [ -z "$line" ] && continue
         mac=$(echo "$line" | awk '{print $2}')
@@ -299,18 +292,11 @@ scan_devices() {
             paired=" [Paired]"
         fi
 
-        menu_items="$menu_items $i \"$name$paired\" "
-        eval "scan_device_$i=\"$mac\""
-        i=$((i + 1))
+        menu_data="${menu_data}${mac}:${name}${paired}\n"
     done <<< "$devices"
 
-    choice=$(eval "dialog --backtitle '$BACKTITLE' \
-        --title '[ Found Devices ]' \
-        --menu 'Select to pair:' 16 60 8 $menu_items" 2>&1 >/dev/tty)
-
-    [ -z "$choice" ] && return
-
-    eval "selected_mac=\$scan_device_$choice"
+    local selected_mac=$(build_dynamic_menu "Found Devices" "Select to pair:" "$menu_data" ":" 16 60)
+    [ $? -ne 0 ] && return
 
     # Check if already paired
     if bluetoothctl devices Paired 2>/dev/null | grep -q "$selected_mac"; then
@@ -361,33 +347,26 @@ quick_connect_menu() {
         return
     fi
 
-    # Only show disconnected devices
-    local menu_items=""
-    local i=1
+    # Only show disconnected devices - prepare menu data
+    local menu_data=""
     while IFS= read -r line; do
         [ -z "$line" ] && continue
         local mac=$(echo "$line" | awk '{print $2}')
         local name=$(echo "$line" | cut -d' ' -f3-)
 
         if ! is_connected "$mac"; then
-            menu_items="$menu_items $i \"$name\" "
-            eval "quick_$i=\"$mac\""
-            i=$((i + 1))
+            menu_data="${menu_data}${mac}:${name}\n"
         fi
     done <<< "$devices"
 
-    if [ -z "$menu_items" ]; then
+    if [ -z "$menu_data" ]; then
         show_message "All paired devices are connected." "Info"
         return
     fi
 
-    choice=$(eval "dialog --backtitle '$BACKTITLE' \
-        --title '[ Quick Connect ]' \
-        --menu 'Select device:' 14 55 6 $menu_items" 2>&1 >/dev/tty)
+    local selected=$(build_dynamic_menu "Quick Connect" "Select device:" "$menu_data" ":" 14 55)
+    [ $? -ne 0 ] && return
 
-    [ -z "$choice" ] && return
-
-    eval "selected=\$quick_$choice"
     connect_device "$selected"
 }
 

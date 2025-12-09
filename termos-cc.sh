@@ -12,17 +12,18 @@ show_main_menu() {
     while true; do
         choice=$(dialog --clear --backtitle "TermOS Control Center" \
             --title "[ TermOS Control Center ]" \
-            --menu "Select a category:" 20 55 12 \
+            --menu "Select a category:" 20 55 13 \
             D "Dashboard" \
             1 "WiFi Settings" \
             2 "Network & VPN" \
             3 "Audio Settings" \
-            4 "Display & Brightness" \
-            5 "Bluetooth" \
-            6 "Storage & Mounts" \
-            7 "System Updates" \
-            8 "System Info" \
-            9 "Power Options" \
+            4 "Display Settings" \
+            5 "Brightness" \
+            6 "Bluetooth" \
+            7 "Storage & Mounts" \
+            8 "System Updates" \
+            9 "System Info" \
+            0 "Power Options" \
             H "Help & About" \
             Q "Exit" \
             2>&1 >/dev/tty)
@@ -41,11 +42,12 @@ show_main_menu() {
             2) source "$MODULES_DIR/network.sh" ;;
             3) source "$MODULES_DIR/audio.sh" ;;
             4) source "$MODULES_DIR/display.sh" ;;
-            5) source "$MODULES_DIR/bluetooth.sh" ;;
-            6) source "$MODULES_DIR/storage.sh" ;;
-            7) source "$MODULES_DIR/updates.sh" ;;
-            8) source "$MODULES_DIR/sysinfo.sh" ;;
-            9) source "$MODULES_DIR/power.sh" ;;
+            5) source "$MODULES_DIR/brightness.sh" ;;
+            6) source "$MODULES_DIR/bluetooth.sh" ;;
+            7) source "$MODULES_DIR/storage.sh" ;;
+            8) source "$MODULES_DIR/updates.sh" ;;
+            9) source "$MODULES_DIR/sysinfo.sh" ;;
+            0) source "$MODULES_DIR/power.sh" ;;
             H) source "$MODULES_DIR/help.sh" ;;
             Q) clear; exit 0 ;;
         esac
@@ -57,6 +59,20 @@ if ! command -v dialog &> /dev/null; then
     echo "Error: dialog is not installed"
     echo "Install with: sudo apk add dialog"
     exit 1
+fi
+
+# Check if running on Alpine Linux
+if [ ! -f /etc/alpine-release ]; then
+    echo "=========================================="
+    echo "WARNING: Not running on Alpine Linux"
+    echo "=========================================="
+    echo "TermOS Control Center is designed for"
+    echo "Alpine Linux. You are currently running on:"
+    echo "$(uname -s) $(uname -r)"
+    echo ""
+    echo "Some features may not work correctly."
+    echo "Press Enter to continue anyway..."
+    read
 fi
 
 # Check for required modules directory

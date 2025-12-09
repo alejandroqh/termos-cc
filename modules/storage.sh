@@ -97,23 +97,16 @@ mounted_menu() {
             return
         fi
 
-        local menu_items=""
-        local i=1
+        # Prepare menu data in "dev:line" format
+        local menu_data=""
         while IFS= read -r line; do
             [ -z "$line" ] && continue
             local dev=$(echo "$line" | awk '{print $1}')
-            menu_items="$menu_items $i \"$line\" "
-            eval "mount_$i=\"$dev\""
-            i=$((i + 1))
+            menu_data="${menu_data}${dev}:${line}\n"
         done <<< "$mounts"
 
-        choice=$(eval "dialog --backtitle '$BACKTITLE' \
-            --title '[ Mounted Filesystems ]' \
-            --menu 'Select to unmount:' 18 70 10 $menu_items" 2>&1 >/dev/tty)
-
-        [ -z "$choice" ] && return
-
-        eval "selected=\$mount_$choice"
+        local selected=$(build_dynamic_menu "Mounted Filesystems" "Select to unmount:" "$menu_data" ":" 18 70)
+        [ $? -ne 0 ] && return
 
         # Don't allow unmounting critical mounts
         case "$selected" in
@@ -140,23 +133,16 @@ unmounted_menu() {
             return
         fi
 
-        local menu_items=""
-        local i=1
+        # Prepare menu data in "dev:line" format
+        local menu_data=""
         while IFS= read -r line; do
             [ -z "$line" ] && continue
             local dev=$(echo "$line" | awk '{print $1}')
-            menu_items="$menu_items $i \"$line\" "
-            eval "unmount_$i=\"$dev\""
-            i=$((i + 1))
+            menu_data="${menu_data}${dev}:${line}\n"
         done <<< "$devices"
 
-        choice=$(eval "dialog --backtitle '$BACKTITLE' \
-            --title '[ Available Devices ]' \
-            --menu 'Select to mount:' 15 60 8 $menu_items" 2>&1 >/dev/tty)
-
-        [ -z "$choice" ] && return
-
-        eval "selected=\$unmount_$choice"
+        local selected=$(build_dynamic_menu "Available Devices" "Select to mount:" "$menu_data" ":" 15 60)
+        [ $? -ne 0 ] && return
 
         if confirm "Mount $selected?"; then
             mount_device "$selected"
@@ -235,23 +221,16 @@ usb_menu() {
             return
         fi
 
-        local menu_items=""
-        local i=1
+        # Prepare menu data in "dev:line" format
+        local menu_data=""
         while IFS= read -r line; do
             [ -z "$line" ] && continue
             local dev=$(echo "$line" | awk '{print $1}')
-            menu_items="$menu_items $i \"$line\" "
-            eval "usb_$i=\"$dev\""
-            i=$((i + 1))
+            menu_data="${menu_data}${dev}:${line}\n"
         done <<< "$usb_devices"
 
-        choice=$(eval "dialog --backtitle '$BACKTITLE' \
-            --title '[ USB Devices ]' \
-            --menu 'Select device to safely remove:' 15 60 8 $menu_items" 2>&1 >/dev/tty)
-
-        [ -z "$choice" ] && return
-
-        eval "selected=\$usb_$choice"
+        local selected=$(build_dynamic_menu "USB Devices" "Select device to safely remove:" "$menu_data" ":" 15 60)
+        [ $? -ne 0 ] && return
 
         if confirm "Safely remove $selected?\n\nThis will unmount all partitions and power off the device."; then
             safely_remove_usb "$selected"
@@ -298,25 +277,18 @@ smart_menu() {
             return
         fi
 
-        local menu_items=""
-        local i=1
+        # Prepare menu data in "disk:display" format
+        local menu_data=""
         while IFS= read -r disk; do
             [ -z "$disk" ] && continue
             local status=$(get_smart_status "$disk" 2>/dev/null | grep -oE "PASSED|FAILED|Unknown" | head -1)
             [ -z "$status" ] && status="N/A"
             local size=$(lsblk -dno SIZE "$disk" 2>/dev/null)
-            menu_items="$menu_items $i \"$disk ($size) [$status]\" "
-            eval "disk_$i=\"$disk\""
-            i=$((i + 1))
+            menu_data="${menu_data}${disk}:${disk} (${size}) [${status}]\n"
         done <<< "$disks"
 
-        choice=$(eval "dialog --backtitle '$BACKTITLE' \
-            --title '[ SMART Health ]' \
-            --menu 'Select disk for details:' 15 60 8 $menu_items" 2>&1 >/dev/tty)
-
-        [ -z "$choice" ] && return
-
-        eval "selected=\$disk_$choice"
+        local selected=$(build_dynamic_menu "SMART Health" "Select disk for details:" "$menu_data" ":" 15 60)
+        [ $? -ne 0 ] && return
 
         # Show SMART info
         show_info "Reading SMART data..."

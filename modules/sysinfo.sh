@@ -25,11 +25,15 @@ get_cpu() {
 }
 
 get_memory() {
-    free -h | awk '/^Mem:/ {printf "%s / %s (%.0f%%)", $3, $2, $3/$2*100}'
+    local percent=$(get_memory_percent)
+    local info=$(get_memory_info)
+    echo "$info (${percent}%)"
 }
 
 get_disk() {
-    df -h / | tail -1 | awk '{printf "%s / %s (%s)", $3, $2, $5}'
+    local percent=$(get_disk_percent)
+    local info=$(get_disk_info)
+    echo "$info (${percent}%)"
 }
 
 get_battery() {
