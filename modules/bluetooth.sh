@@ -254,7 +254,8 @@ show_paired_devices() {
             menu_data="${menu_data}${mac}:${name} ${status}\n"
         done <<< "$devices"
 
-        local selected_mac=$(build_dynamic_menu "Paired Devices" "Select device:" "$menu_data" ":" 16 65)
+        local selected_mac
+        selected_mac=$(build_dynamic_menu "Paired Devices" "Select device:" "$menu_data" ":" 16 65)
         [ $? -ne 0 ] && return
 
         device_action "$selected_mac"
@@ -295,7 +296,8 @@ scan_devices() {
         menu_data="${menu_data}${mac}:${name}${paired}\n"
     done <<< "$devices"
 
-    local selected_mac=$(build_dynamic_menu "Found Devices" "Select to pair:" "$menu_data" ":" 16 60)
+    local selected_mac
+    selected_mac=$(build_dynamic_menu "Found Devices" "Select to pair:" "$menu_data" ":" 16 60)
     [ $? -ne 0 ] && return
 
     # Check if already paired
@@ -364,7 +366,8 @@ quick_connect_menu() {
         return
     fi
 
-    local selected=$(build_dynamic_menu "Quick Connect" "Select device:" "$menu_data" ":" 14 55)
+    local selected
+    selected=$(build_dynamic_menu "Quick Connect" "Select device:" "$menu_data" ":" 14 55)
     [ $? -ne 0 ] && return
 
     connect_device "$selected"

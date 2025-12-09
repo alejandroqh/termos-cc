@@ -105,7 +105,8 @@ mounted_menu() {
             menu_data="${menu_data}${dev}:${line}\n"
         done <<< "$mounts"
 
-        local selected=$(build_dynamic_menu "Mounted Filesystems" "Select to unmount:" "$menu_data" ":" 18 70)
+        local selected
+        selected=$(build_dynamic_menu "Mounted Filesystems" "Select to unmount:" "$menu_data" ":" 18 70)
         [ $? -ne 0 ] && return
 
         # Don't allow unmounting critical mounts
@@ -141,7 +142,8 @@ unmounted_menu() {
             menu_data="${menu_data}${dev}:${line}\n"
         done <<< "$devices"
 
-        local selected=$(build_dynamic_menu "Available Devices" "Select to mount:" "$menu_data" ":" 15 60)
+        local selected
+        selected=$(build_dynamic_menu "Available Devices" "Select to mount:" "$menu_data" ":" 15 60)
         [ $? -ne 0 ] && return
 
         if confirm "Mount $selected?"; then
@@ -229,7 +231,8 @@ usb_menu() {
             menu_data="${menu_data}${dev}:${line}\n"
         done <<< "$usb_devices"
 
-        local selected=$(build_dynamic_menu "USB Devices" "Select device to safely remove:" "$menu_data" ":" 15 60)
+        local selected
+        selected=$(build_dynamic_menu "USB Devices" "Select device to safely remove:" "$menu_data" ":" 15 60)
         [ $? -ne 0 ] && return
 
         if confirm "Safely remove $selected?\n\nThis will unmount all partitions and power off the device."; then
@@ -287,7 +290,8 @@ smart_menu() {
             menu_data="${menu_data}${disk}:${disk} (${size}) [${status}]\n"
         done <<< "$disks"
 
-        local selected=$(build_dynamic_menu "SMART Health" "Select disk for details:" "$menu_data" ":" 15 60)
+        local selected
+        selected=$(build_dynamic_menu "SMART Health" "Select disk for details:" "$menu_data" ":" 15 60)
         [ $? -ne 0 ] && return
 
         # Show SMART info

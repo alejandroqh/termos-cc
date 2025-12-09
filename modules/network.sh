@@ -63,7 +63,8 @@ vpn_menu() {
             fi
         done <<< "$connections"
 
-        local selected=$(build_dynamic_menu "VPN Connections" "Select VPN:" "$menu_data" ":" 15 50)
+        local selected
+        selected=$(build_dynamic_menu "VPN Connections" "Select VPN:" "$menu_data" ":" 15 50)
         [ $? -ne 0 ] && return
 
         # Check if active
@@ -135,7 +136,8 @@ wireguard_menu() {
             menu_data="${menu_data}${iface}:${iface} [${status}]\n"
         done <<< "$all_interfaces"
 
-        local selected=$(build_dynamic_menu "WireGuard" "Select interface to toggle:" "$menu_data" ":" 15 50)
+        local selected
+        selected=$(build_dynamic_menu "WireGuard" "Select interface to toggle:" "$menu_data" ":" 15 50)
         [ $? -ne 0 ] && return
         wg_toggle "$selected"
     done

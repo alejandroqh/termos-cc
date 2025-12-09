@@ -199,7 +199,8 @@ output_device_menu() {
             menu_data="${menu_data}${name}:${desc}${marker}\n"
         done <<< "$sinks"
 
-        local selected=$(build_dynamic_menu "Output Devices" "Select output device:" "$menu_data" ":" 15 65)
+        local selected
+        selected=$(build_dynamic_menu "Output Devices" "Select output device:" "$menu_data" ":" 15 65)
         [ $? -ne 0 ] && return
 
         set_default_sink "$selected"
@@ -265,7 +266,8 @@ select_input_device() {
         menu_data="${menu_data}${name}:${desc}${marker}\n"
     done <<< "$sources"
 
-    local selected=$(build_dynamic_menu "Input Devices" "Select input device:" "$menu_data" ":" 15 65)
+    local selected
+    selected=$(build_dynamic_menu "Input Devices" "Select input device:" "$menu_data" ":" 15 65)
     [ $? -ne 0 ] && return
 
     set_default_source "$selected"
@@ -292,7 +294,8 @@ per_app_menu() {
             menu_data="${menu_data}${idx},${name}:${name} (${vol}%)\n"
         done <<< "$inputs"
 
-        local selected=$(build_dynamic_menu "Per-Application Volume" "Select application:" "$menu_data" ":" 15 55)
+        local selected
+        selected=$(build_dynamic_menu "Per-Application Volume" "Select application:" "$menu_data" ":" 15 55)
         [ $? -ne 0 ] && return
 
         # Extract idx and name from selected (format: "idx,name")
@@ -471,7 +474,8 @@ profiles_menu() {
         menu_data="${menu_data}${profile}:${profile}${marker}\n"
     done <<< "$profiles"
 
-    local selected=$(build_dynamic_menu "Audio Profiles" "Select profile:" "$menu_data" ":" 15 60)
+    local selected
+    selected=$(build_dynamic_menu "Audio Profiles" "Select profile:" "$menu_data" ":" 15 60)
     [ $? -ne 0 ] && return
 
     set_card_profile "$first_card" "$selected"

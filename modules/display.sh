@@ -232,7 +232,8 @@ resolution_menu() {
         return
     fi
 
-    local choice=$(build_simple_menu "Select Resolution" "Choose resolution for $display:" "$resolutions" 18 50)
+    local choice
+    choice=$(build_simple_menu "Select Resolution" "Choose resolution for $display:" "$resolutions" 18 50)
     [ $? -ne 0 ] && return
 
     # Extract the selected resolution (choice is the index, we need the actual line)
